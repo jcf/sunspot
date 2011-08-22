@@ -131,21 +131,26 @@ See Sunspot.search for more information.
 
 === Work with search results (Haml for readability):
 
-  .facets
-    ul.blog_facet
-      - @search.facet(:blog_id).rows.each do |row|
-        li.facet_row
-          = link_to(row.instance.name, params.merge(:blog_id => row.value))
-          %span.count== (#{row.count})
-  .page_info== Displaying page #{@search.hits.page} of #{@search.hits.per_page} out of #{@search.total} results
-  - @search.each_hit_with_result do |hit, post|
-    .search_result
-      %h3.title
-        = link_to(h(hit.stored(:title)), post_url(post))
-      - if hit.score
-        %span.relevance== (#{hit.score})
-      %p= hit.highlight(:description).format { |word| "<span class=\"highlight\">#{word}</span>" }
-  .pagination= will_paginate(@search.hits)
+``` haml
+.facets
+  ul.blog_facet
+    - @search.facet(:blog_id).rows.each do |row|
+      li.facet_row
+        = link_to(row.instance.name, params.merge(:blog_id => row.value))
+        %span.count== (#{row.count})
+%h2
+  %span.count= pluralize(@search.total, 'result')
+  %span.pages Page #{@search.hits.current_page} of #{@search.hits.total_pages} 
+
+- @search.each_hit_with_result do |hit, post|
+  .search_result
+    %h3.title
+      = link_to(h(hit.stored(:title)), post_url(post))
+    - if hit.score
+      %span.relevance== (#{hit.score})
+    %p= hit.highlight(:description).format { |word| "<span class=\"highlight\">#{word}</span>" }
+.pagination= will_paginate(@search.hits)
+```
 
 == About the API documentation
 
